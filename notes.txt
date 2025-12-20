@@ -1,0 +1,12 @@
+1. First take the data
+2. apply nlp  and divide into sentences using 'en_core_web_sm'.
+3. extract nouns.
+4. count nouns and then find most_ommon noun.
+5. replace most_common noun with empty space.
+6. make an answer_choices list and add answer first.
+7. make 3 other options without including original answer and also add "[Distractor]" if number of options are less.
+8. shuffle the answer_choices.
+9. store the correct_answer option.
+10. then store the question_stem + answer_choices + correct_answer
+11. return the mcqs.
+

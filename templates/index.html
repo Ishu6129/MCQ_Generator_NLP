@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate MCQs</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f1f5f9;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 420px;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+        h1 {
+            font-size: 26px;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: 600;
+        }
+        .form-group {
+            text-align: center;
+        }
+        input[type="file"] {
+            display: inline-block;
+            width: auto;
+        }
+        select {
+            margin-top: 5px;
+            text-align: center;
+        }
+        button {
+            width: 100%;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Generate MCQs</h1>
+        <p>This application will help you generate multiple MCQs from multiple files</p>
+        <form action="" enctype="multipart/form-data" method="POST">
+            <div class="form-group">
+                <label for="file">Upload Files (PDF/TXT)</label>
+                <input type="file" class="form-control-file" id="file" name="uploaded_files" multiple>
+            </div>
+            <div class="form-group">
+                <label for="num_questions">Number of Questions</label>
+                <select class="form-control" name="num_questions" id="num_questions">
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="15">20</option>
+                    <option value="20">30</option>
+                </select>
+            </div>
+            <button class="btn btn-primary" type="submit">Generate</button>
+        </form>
+    </div>
+</body>
+</html>

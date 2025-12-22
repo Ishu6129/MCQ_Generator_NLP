@@ -3,5 +3,3 @@ PyPDF2
 spacy
 gunicorn
 requests
-io
-re

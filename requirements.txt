@@ -7,3 +7,4 @@ google-generativeai
 fpdf
 requests
 python-dotenv
+gunicorn

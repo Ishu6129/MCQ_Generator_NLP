@@ -13,16 +13,17 @@ body {
 
 .container {
     width: 50%;
-    margin: 50px auto;
-    background: #fff;
-    padding: 25px;
+    margin: 5% auto;
+    background: #1f1d1dff;
+    padding: 30px;
     border-radius: 8px;
     box-shadow: 0 0 12px rgba(0,0,0,0.1);
+    color:white;
 }
 
 h1 {
     text-align: center;
-    color: #333;
+    color: #ccdb44ff;
 }
 
 .form-group {
@@ -40,6 +41,7 @@ input[type="text"],
 input[type="number"] {
     width: 100%;
     padding: 10px;
+    margin:0px;
     border-radius: 4px;
     border: 1px solid #ccc;
 }
@@ -57,6 +59,10 @@ button {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+
+.limit{
+    color:grey;
 }
 
 button:hover {
@@ -90,7 +96,7 @@ button:hover {
                 max="15"
                 required
             >
-            <small style="color:#555;">
+            <small class="limit">
                 (AI mode supports up to 15 MCQs)
             </small>
         </div>

@@ -1,130 +1,96 @@
-from flask import Flask,request,render_template
-from PyPDF2 import PdfReader
-import spacy
-import random
-import requests
-from collections import Counter
-import io
-import re
+from flask import Flask, render_template, request, send_file
+from io import BytesIO
+from dotenv import load_dotenv
+load_dotenv()
 
+from config import *
+from services import (
+    extractText,
+    readFromLink,
+    summarize,
+    generatClassicMcqs,
+    generate_ai_mcqs,
+    generate_pdf
+)
+from services.ai_parser import parse_ai_mcqs
+MAX_AI_MCQS = 15
 
+generated_pdf_cache = {}
 
-app=Flask(__name__)
+def is_allowed_file(filename, allowed_extensions):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in allowed_extensions
 
-nlp = spacy.load("en_core_web_sm")
-import random
-from collections import Counter
+app = Flask(__name__)
 
-def generate_mcqs(text, num_questions=5):
-    if not text:
-        return []
-    
-    doc = nlp(text)
-    
-    sentences = [sent.text for sent in doc.sents]
-    selected_sentences = random.sample(
-        sentences, min(num_questions, len(sentences))
-    )
-    
-    mcqs = []
-    for sentence in selected_sentences:
-        sent_doc = nlp(sentence)
-        nouns = [token.text for token in sent_doc if token.pos_ == "NOUN" and not token.is_stop]
+@app.route("/", methods=["GET", "POST"])
+def home():
+    if request.method == "POST":
+        combined_text = ""
 
-        if len(nouns) < 2:
-            continue
+        # Uploaded File
+        uploaded_file = request.files.get("file")
+        if uploaded_file and is_allowed_file(uploaded_file.filename, ALLOWED_EXTENSIONS):
+            file_bytes = uploaded_file.read()
+            combined_text += extractText(file_bytes, uploaded_file.filename)
 
-        subject = Counter(nouns).most_common(1)[0][0]
-        question = sentence.replace(subject, "_____", 1)
-
-        distractors = list(set(nouns) - {subject})
-        while len(distractors) < 3:
-            distractors.append("None")
-        options = [subject] + random.sample(distractors, 3)
-        random.shuffle(options)
-
-        correct_answer = chr(65 + options.index(subject))
-
-        mcqs.append((question, options, correct_answer))
-
-    return mcqs
-
-def process_pdf(file):
-    text=""
-    pdf_reader=PdfReader(file)
-    for page_num in range(len(pdf_reader.pages)):
-        page_text = pdf_reader.pages[page_num].extract_text()
-        if page_text:
-            text += page_text
-
-    return text
-
-def extract_drive_file_id(link):
-    patterns = [
-        r"https://drive.google.com/file/d/([a-zA-Z0-9_-]+)",
-        r"https://drive.google.com/open\?id=([a-zA-Z0-9_-]+)",
-        r"https://docs.google.com/document/d/([a-zA-Z0-9_-]+)"
-    ]
-    for pattern in patterns:
-        match = re.search(pattern, link)
-        if match:
-            return match.group(1)
-    return None
-
-
-def process_drive_file(drive_link):
-    file_id = extract_drive_file_id(drive_link)
-    if not file_id:
-        return ""
-
-    # If uploaded link is of Doc
-    doc_url = f"https://docs.google.com/document/d/{file_id}/export?format=txt"
-    response = requests.get(doc_url)
-
-    if response.status_code == 200 and "DOCTYPE" not in response.text:
-        return response.text
-
-    # If uploaded link is of pdf
-    pdf_url = f"https://drive.google.com/uc?id={file_id}&export=download"
-    pdf_response = requests.get(pdf_url)
-
-    pdf_file = io.BytesIO(pdf_response.content)
-    reader = PdfReader(pdf_file)
-
-    text = ""
-    for page in reader.pages:
-        text += page.extract_text() or ""
-
-    return text
-
-
-@app.route("/",methods=['POST','GET'])
-def index():
-    if request.method=="POST":
-        text=''
-        
-        files = request.files.getlist("uploaded_files")
-        for file in files:
-            if file.filename.endswith(".pdf"):
-                text += process_pdf(file)
-            elif file.filename.endswith(".txt"):
-                text += file.read().decode("utf-8")
-
-        # Link
+        # Link Files
         drive_link = request.form.get("drive_link")
         if drive_link:
-            text += process_drive_file(drive_link)
+            combined_text += readFromLink(drive_link)
 
-        if not text.strip():
-            return "<script>alert('No valid text found');window.location.href='/';</script>"
+        if not combined_text.strip():
+            return "<script>alert('No valid text provided');history.back()</script>"
 
-        num_questions=int(request.form['num_questions'])
-        mcqs=generate_mcqs(text,num_questions)
-        mcq_with_index=[(i+1,mcq) for i,mcq in enumerate(mcqs)]
-        return render_template('mcqs.html',mcqs=mcq_with_index) 
-    
-    return render_template('index.html')
+       
+        limited_text = combined_text[:MAX_TEXT_CHAR_LIMIT]
+        number_of_questions = int(request.form["num_questions"])
+        selected_mode = request.form["mode"]
 
+        # If Ai selected
+        if selected_mode == "ai":
+            if number_of_questions > MAX_AI_MCQS:
+                return (
+                    "<script>"
+                    "alert('AI mode supports a maximum of 15 MCQs only.');"
+                    "history.back();"
+                    "</script>"
+                )
 
-if __name__=="__main__":
-    app.run(host="0.0.0.0", port=3000)
+            summary_text = summarize(limited_text, MAX_SUMMARY_SENTENCES)
+            raw_ai_output = generate_ai_mcqs(summary_text, number_of_questions)
+            parsed_mcqs = parse_ai_mcqs(raw_ai_output)
+
+            if not parsed_mcqs:
+                return "<script>alert('AI failed to generate valid MCQs');history.back()</script>"
+
+            generated_pdf_cache["latest"] = generate_pdf(raw_ai_output)
+
+            return render_template(
+                "results.html",
+                mcqs=parsed_mcqs
+            )
+        manual_mcqs = generatClassicMcqs(limited_text, number_of_questions)
+
+        return render_template(
+            "mcqs.html",
+            mcqs=enumerate(manual_mcqs, 1)
+        )
+
+    return render_template("index.html")
+
+@app.route("/download/pdf")
+def download_pdf():
+    pdf_file = generated_pdf_cache.get("latest")
+
+    if not pdf_file:
+        return "No PDF available", 404
+
+    return send_file(
+        pdf_file,
+        mimetype="application/pdf",
+        as_attachment=True,
+        download_name="mcqs.pdf"
+    )
+
+if __name__ == "__main__":
+    app.run(debug=True)

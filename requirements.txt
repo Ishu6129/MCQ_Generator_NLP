@@ -1,5 +1,9 @@
-Flask
+flask
+pdfplumber
+python-docx
 PyPDF2
 spacy
-gunicorn
+google-generativeai
+fpdf
 requests
+python-dotenv

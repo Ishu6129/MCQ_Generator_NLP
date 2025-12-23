@@ -3,8 +3,9 @@ pdfplumber
 python-docx
 PyPDF2
 spacy
-google-generativeai
 fpdf
 requests
 python-dotenv
+google-genai
 gunicorn
+scikit-learn

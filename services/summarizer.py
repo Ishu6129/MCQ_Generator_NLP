@@ -1,25 +1,32 @@
-import numpy as np
 import spacy
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 nlp = spacy.load("en_core_web_sm")
 
-def summarize(text, max_sentences):
+def summarize(text, max_sentences=8):
     doc = nlp(text)
-    sentences = [sent.text for sent in doc.sents]
+
+    sentences = [
+        sent.text.strip()
+        for sent in doc.sents
+        if len(sent.text.strip()) > 30
+    ]
 
     if len(sentences) <= max_sentences:
-        return text
+        return " ".join(sentences)
 
     vectorizer = TfidfVectorizer(stop_words="english")
     tfidf_matrix = vectorizer.fit_transform(sentences)
 
-    sentence_scores = np.sum(tfidf_matrix.toarray(), axis=1)
+    sentence_scores = tfidf_matrix.sum(axis=1).A1
 
     ranked_sentences = sorted(
-        ((sentence_scores[i], s) for i, s in enumerate(sentences)),
+        zip(sentence_scores, sentences),
         reverse=True
     )
 
-    return " ".join(s for _, s in ranked_sentences[:max_sentences])
-    
+    summary = " ".join(
+        sentence for _, sentence in ranked_sentences[:max_sentences]
+    )
+
+    return summary

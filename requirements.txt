@@ -3,8 +3,7 @@ pdfplumber
 python-docx
 PyPDF2
 spacy
-nltk
-scikit-learn
 google-generativeai
 fpdf
 requests
+python-dotenv

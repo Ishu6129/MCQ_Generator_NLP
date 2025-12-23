@@ -1,46 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generated MCQs</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-   <h1 class="mt-4 text-center">Generated MCQs</h1>
-    <div class="container" id="mcqs-container">
-        {% for index, mcq in mcqs %}
-            <div class="card mb-3">
-                <div class="card-body">
-                    <h5 class="card-title">Q{{ index }}: {{ mcq[0] }}?</h5>
-                    <form>
-                        {% set options = ['A', 'B', 'C', 'D'] %}
-                        {% set num_choices = mcq[1]|length %}
-                        {% for choice_index in range(num_choices) %}
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="answer{{ index }}" id="choice{{ index }}{{ choice_index }}" value="{{ choice_index }}">
-                                <label class="form-check-label" for="choice{{ index }}{{ choice_index }}">
-                                    {{ options[choice_index] }}: {{ mcq[1][choice_index] }}
-                                </label>
-                            </div>
-                        {% endfor %}
-                    </form>
-                    <small class="correct-answer" id="correct{{ index }}" style="display:none;">Correct Answer: {{ mcq[2] }}</small>
+<meta charset="UTF-8">
+<title>Manual MCQs</title>
 
-                </div>
-            </div>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    padding: 20px;
+}
+
+.container {
+    width: 70%;
+    margin: auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.mcq {
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.question {
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.option {
+    margin: 5px 0;
+    padding: 6px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.show-btn {
+    margin-top: 10px;
+    padding: 6px 12px;
+    background-color: #007bff;
+    border: none;
+    color: white;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.show-btn:hover {
+    background-color: #0056b3;
+}
+
+.correct {
+    margin-top: 10px;
+    font-weight: bold;
+    color: green;
+    display: none;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+    <h1>Manual MCQs</h1>
+
+    {% for index, mcq in mcqs %}
+    <div class="mcq">
+        <div class="question">
+            {{ index }}. {{ mcq[0] }}
+        </div>
+
+        {% for option in mcq[1] %}
+            <div class="option">{{ option }}</div>
         {% endfor %}
-        <button id="show-results-btn" class="btn btn-primary">Show Results</button>
+
+        <button class="show-btn" onclick="toggleAnswer('ans{{ index }}')">
+            Show Answer
+        </button>
+
+        <div class="correct" id="ans{{ index }}">
+            Correct Answer: {{ mcq[2] }}
+        </div>
     </div>
-</body>
+    {% endfor %}
+</div>
+
 <script>
-document.getElementById("show-results-btn").onclick = function () {
-    var total = document.getElementsByClassName("correct-answer").length;
-    for (var i = 1; i <= total; i++) {
-        document.getElementById("correct" + i).style.display = "block";
+function toggleAnswer(id) {
+    const el = document.getElementById(id);
+    if (el.style.display === "none") {
+        el.style.display = "block";
+    } else {
+        el.style.display = "none";
     }
-    this.style.display = "none";
-};
+}
 </script>
 
+</body>
 </html>

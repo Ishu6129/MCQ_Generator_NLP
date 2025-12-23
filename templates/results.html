@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Generated MCQs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            padding: 20px;
+        }
+
+        .container {
+            width: 75%;
+            margin: auto;
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        .mcq {
+            background-color: #e9f5ff;
+            border: 1px solid #007bff;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .question {
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        .option {
+            background-color: #ffffff;
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: 1px solid #007bff;
+            margin: 5px 0;
+        }
+
+        .correct-answer {
+            margin-top: 10px;
+            font-weight: bold;
+            color: green;
+        }
+
+        .actions {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 18px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 0 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+            }
+        }
+        .show-btn {
+            margin-top: 10px;
+            padding: 6px 12px;
+            background-color: #28a745;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .show-btn:hover {
+            background-color: #218838;
+}
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>AI Generated MCQs</h1>
+
+    {% if mcqs and mcqs|length > 0 %}
+        {% for mcq in mcqs %}
+        <div class="mcq">
+            <div class="question">
+                {{ loop.index }}. {{ mcq.question }}
+            </div>
+
+            {% for option in mcq.options %}
+                <div class="option">{{ option }}</div>
+            {% endfor %}
+
+            <button class="show-btn" onclick="toggleAnswer('ans{{ loop.index }}')">
+                Show Answer
+            </button>
+
+            <div class="correct-answer" id="ans{{ loop.index }}" style="display:none;">
+                Correct Answer: {{ mcq.correct }}
+            </div>
+        </div>
+        {% endfor %}
+
+    {% else %}
+        <p style="text-align:center;color:red;">
+            No MCQs could be generated. Please try again.
+        </p>
+    {% endif %}
+
+    <div class="actions">
+        <a href="/download/pdf" class="btn">Download PDF</a>
+        <a href="/" class="btn">Generate Again</a>
+    </div>
+</div>
+<script>
+function toggleAnswer(id) {
+    const el = document.getElementById(id);
+    if (el.style.display === "none") {
+        el.style.display = "block";
+    } else {
+        el.style.display = "none";
+    }
+}
+</script>
+
+</body>
+</html>

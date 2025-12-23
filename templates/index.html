@@ -1,82 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generate MCQs</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: #f1f5f9;
-            font-family: Arial, sans-serif;
-        }
-        .container {
-            width: 420px;
-            background: #ffffff;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.15);
-            text-align: center;
-        }
-        h1 {
-            font-size: 26px;
-            margin-bottom: 10px;
-        }
-        p {
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 20px;
-        }
-        label {
-            font-weight: 600;
-        }
-        .form-group {
-            text-align: center;
-        }
-        input[type="file"] {
-            display: inline-block;
-            width: auto;
-        }
-        select {
-            margin-top: 5px;
-            text-align: center;
-        }
-        button {
-            width: 100%;
-            margin-top: 15px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MCQ Generator</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+}
+
+.container {
+    width: 50%;
+    margin: 50px auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 0 12px rgba(0,0,0,0.1);
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+input[type="file"],
+input[type="text"],
+input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.mode {
+    margin: 15px 0;
+}
+
+button {
+    width: 100%;
+    background-color: #28a745;
+    color: white;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #218838;
+}
+</style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>Generate MCQs</h1>
-        <p>This application will help you generate multiple MCQs from multiple files</p>
-        <form action="" enctype="multipart/form-data" method="POST">
-            <div class="form-group">
-                <label for="file">Upload Files (PDF/TXT)</label>
-                <input type="file" class="form-control-file" id="file" name="uploaded_files" multiple>
-            </div>
-            <div class="form-group">
-                <label>Google Drive File Link (Optional)</label>
-                <input type="text" class="form-control"
-                    name="drive_link"
-                    placeholder="Paste Google Drive PDF / DOC link">
-            </div>
-            <div class="form-group">
-                <label for="num_questions">Number of Questions</label>
-                <select class="form-control" name="num_questions" id="num_questions">
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="15">20</option>
-                    <option value="20">30</option>
-                </select>
-            </div>
-            <button class="btn btn-primary" type="submit">Generate</button>
-        </form>
-    </div>
+<div class="container">
+    <h1>MCQ Generator</h1>
+
+    <form method="POST" enctype="multipart/form-data">
+
+        <div class="form-group">
+            <label>Upload File (PDF / TXT / DOCX)</label>
+            <input type="file" name="file">
+        </div>
+
+        <div class="form-group">
+            <label>OR Google Drive File Link</label>
+            <input type="text" name="drive_link" placeholder="Paste Google Drive link">
+        </div>
+
+        <div class="form-group">
+            <label for="num_questions">Number of MCQs:</label>
+            <input
+                type="number"
+                name="num_questions"
+                min="1"
+                max="15"
+                required
+            >
+            <small style="color:#555;">
+                (AI mode supports up to 15 MCQs)
+            </small>
+        </div>
+
+
+        <div class="mode">
+            <label>
+                <input type="radio" name="mode" value="manual" checked>
+                Manual MCQs (Offline NLP)
+            </label><br>
+            <label>
+                <input type="radio" name="mode" value="ai">
+                AI MCQs (Optimized)
+            </label>
+        </div>
+
+        <button type="submit">Generate MCQs</button>
+    </form>
+</div>
 </body>
 </html>

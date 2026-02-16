@@ -104,17 +104,37 @@ button:hover {
 
         <div class="mode">
             <label>
-                <input type="radio" name="mode" value="manual" checked>
+                <input type="radio" name="mode" value="manual" checked onclick="updateDescription()">
                 Manual MCQs (Offline NLP)
             </label><br>
             <label>
-                <input type="radio" name="mode" value="ai">
+                <input type="radio" name="mode" value="ai" onclick="updateDescription()">
                 AI MCQs (Optimized)
             </label>
+        
+            <div id="modeDescription" style="margin-top:10px; font-size:14px; color:#ccc;">
+                Generates MCQs using rule-based NLP (spaCy) without external API usage.
+            </div>
         </div>
+
 
         <button type="submit">Generate MCQs</button>
     </form>
 </div>
+<script>
+function updateDescription() {
+    const selectedMode = document.querySelector('input[name="mode"]:checked').value;
+    const description = document.getElementById("modeDescription");
+
+    if (selectedMode === "manual") {
+        description.innerHTML = 
+            "Generates MCQs using rule-based NLP (spaCy). No API calls are made. Suitable for unlimited usage.";
+    } else {
+        description.innerHTML = 
+            "Uses Google Gemini API to generate high-quality MCQs. API tokens are consumed per request. Limited to 15 MCQs per session to control token usage.";
+    }
+}
+</script>
+
 </body>
 </html>
